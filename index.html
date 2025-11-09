@@ -463,7 +463,7 @@
                                 <div class="card-body">
                                     <h5 class="card-title"><i class="fas fa-users me-2"></i>นักเรียนทั้งหมด</h5>
                                     <h2>{{ statsSummary.total }}</h2>
-                                </div>
+                                 </div>
                             </div>
                         </div>
                         <div class="col-md-4">
@@ -663,6 +663,7 @@
                 activityPhotoPreview: null,
                 formData: {
                     academicYear: '2568', semester: '1', activityDate: new Date().toISOString().slice(0, 10),
+                    activityDateFormatted: '', // <!-- [FIX 1] ADDED: to store the formatted date safely
                     activityName: '', activityHours: 1, activityLocation: '',
                     notes: '', teacher: {}, signature: null, activityPhoto: null,
                 },
@@ -842,9 +843,10 @@
                 const today = new Date().toISOString().slice(0, 10);
                 this.formData.activityDate = today;
                 flatpickr("#activityDatePicker").setDate(today, true);
+                // The onReady/onChange handler will update formData.activityDateFormatted automatically
                 this.formData.activityName = '';
                 this.formData.activityHours = 1;
-                this.formData.activityLocation = 'โรงเรียนปากช่อง';
+                this.formData.activityLocation = '';
                 this.formData.notes = '';
                 this.formData.teacher = {};
                 this.formData.signature = null;
@@ -870,7 +872,8 @@ async submitForm(event) {
         return;
     }
 
-    const formattedDate = document.getElementById('activityDatePicker')._flatpickr.altInput.value;
+    // <!-- [FIX 4] REPLACED: Read from Vue data model instead of fragile DOM access -->
+    const formattedDate = this.formData.activityDateFormatted; 
     const studentListHtml = selectedStudents.map(s => `<li>${s.name}</li>`).join('');
     const confirmationResult = await Swal.fire({
         title: 'ยืนยันการบันทึกข้อมูล',
@@ -959,13 +962,17 @@ async submitForm(event) {
         this.resetForm();
         this.isSubmitting = false;
 
-        // 5. แสดง Alert ยืนยัน
-        Swal.fire({
-            title: 'บันทึกข้อมูลสำเร็จ',
-            text: 'ระบบได้เริ่มบันทึกข้อมูลให้แล้ว',
-            icon: 'success',
-            confirmButtonText: 'ตกลง'
-        });
+        // 5. แสดง Loading 10 วินาที แล้วจึงแสดง Alert ยืนยัน
+        $.LoadingOverlay("show"); // แสดง loading
+        setTimeout(() => {
+            $.LoadingOverlay("hide"); // ซ่อน loading
+            Swal.fire({
+                title: 'บันทึกข้อมูลสำเร็จ',
+                text: 'ระบบได้เริ่มบันทึกข้อมูลให้แล้ว',
+                icon: 'success',
+                confirmButtonText: 'ตกลง'
+            });
+        }, 10000); // หน่วงเวลา 10 วินาที (10000 มิลลิวินาที)
     }
 },
             getEvalBadgeClass(result) {
@@ -1131,14 +1138,18 @@ async submitForm(event) {
                 onReady: (selectedDates, dateStr, instance) => {
                     if (instance.altInput) {
                         const date = selectedDates.length > 0 ? selectedDates[0] : new Date();
-                        instance.altInput.value = `${instance.formatDate(date, "j M")} ${date.getFullYear() + 543}`;
+                        const formatted = `${instance.formatDate(date, "j M")} ${date.getFullYear() + 543}`; // <!-- [FIX 2]
+                        instance.altInput.value = formatted;
+                        this.formData.activityDateFormatted = formatted; // <!-- [FIX 2] ADDED
                     }
                 },
                 onChange: (selectedDates, dateStr, instance) => {
                     this.formData.activityDate = dateStr;
                     if (instance.altInput && selectedDates.length > 0) {
                         const date = selectedDates[0];
-                        instance.altInput.value = `${instance.formatDate(date, "j M")} ${date.getFullYear() + 543}`;
+                        const formatted = `${instance.formatDate(date, "j M")} ${date.getFullYear() + 543}`; // <!-- [FIX 3]
+                        instance.altInput.value = formatted;
+                        this.formData.activityDateFormatted = formatted; // <!-- [FIX 3] ADDED
                     }
                 },
             });
