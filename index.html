@@ -4,7 +4,7 @@
    <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge, chrome=1" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PC|Student Volunteer'68 v1.3 (New Loader)</title> <link rel="shortcut icon" type="image/png" href="https://img2.pic.in.th/pic/Pakchong_School-removebg-preview.png">
+    <title>PC|Student Volunteer'68 v1.4 (Final)</title> <link rel="shortcut icon" type="image/png" href="https://img2.pic.in.th/pic/Pakchong_School-removebg-preview.png">
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
@@ -119,119 +119,54 @@
             background-color: #e9ecef;
             border-radius: 0.75rem;
         }
-        /* START: Custom Dropdown Checkbox Styles */
-        .dropdown-checkbox-container {
-            position: relative;
-        }
+        /* Custom Dropdown & Datalist Styles */
+        .dropdown-checkbox-container { position: relative; }
         .dropdown-checkbox-menu {
-            position: absolute;
-            top: 100%;
-            left: 0;
-            width: 100%;
-            max-height: 250px;
-            overflow-y: auto;
-            background-color: #fff;
-            border: 1px solid #ced4da;
-            border-radius: 0 0 0.5rem 0.5rem;
-            padding: 1rem;
-            z-index: 1050;
+            position: absolute; top: 100%; left: 0; width: 100%; max-height: 250px;
+            overflow-y: auto; background-color: #fff; border: 1px solid #ced4da;
+            border-radius: 0 0 0.5rem 0.5rem; padding: 1rem; z-index: 1050;
             box-shadow: 0 4px 8px rgba(0,0,0,0.1);
         }
-        .dropdown-checkbox-menu .form-check {
-            margin-bottom: 0.5rem;
-        }
-        /* END: Custom Dropdown Checkbox Styles */
-        /* START: Custom Datalist Styles */
+        .dropdown-checkbox-menu .form-check { margin-bottom: 0.5rem; }
         .autocomplete-dropdown {
-            position: absolute;
-            background-color: white;
-            border: 1px solid #ced4da;
-            border-top: none;
-            border-radius: 0 0 0.5rem 0.5rem;
-            width: 100%; 
-            max-height: 250px;
-            overflow-y: auto;
-            z-index: 1050; /* Make sure it's above other elements */
+            position: absolute; background-color: white; border: 1px solid #ced4da;
+            border-top: none; border-radius: 0 0 0.5rem 0.5rem; width: 100%; 
+            max-height: 250px; overflow-y: auto; z-index: 1050;
             box-shadow: 0 4px 8px rgba(0,0,0,0.1);
         }
         .autocomplete-item {
-            display: block;
-            padding: 0.75rem 1.25rem;
-            color: #212529;
-            text-decoration: none;
-            cursor: pointer;
-            transition: background-color 0.15s ease-in-out;
+            display: block; padding: 0.75rem 1.25rem; color: #212529;
+            text-decoration: none; cursor: pointer; transition: background-color 0.15s ease-in-out;
         }
-        .autocomplete-item:hover {
-            background-color: #e9ecef;
-            color: #000;
-        }
-        /* END: Custom Datalist Styles */
+        .autocomplete-item:hover { background-color: #e9ecef; color: #000; }
 
-        /* --- START: NEW LOADING OVERLAY STYLES --- */
+        /* --- NEW LOADING OVERLAY STYLES  --- */
         #loading-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(255, 255, 255, 0.95);
-            display: none; /* Default hidden */
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            z-index: 99999;
-            backdrop-filter: blur(8px);
-            transition: opacity 0.3s ease;
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(255, 255, 255, 0.95); display: none;
+            flex-direction: column; justify-content: center; align-items: center;
+            z-index: 99999; backdrop-filter: blur(8px); transition: opacity 0.3s ease;
         }
-
         .loading-progress-container {
-            width: 320px;
-            background-color: #e5e7eb; /* gray-200 */
-            border-radius: 9999px;
-            box-shadow: inset 0 2px 4px 0 rgba(0, 0, 0, 0.06);
-            border: 1px solid #e2e8f0;
-            padding: 4px;
+            width: 320px; background-color: #e5e7eb; border-radius: 9999px;
+            box-shadow: inset 0 2px 4px 0 rgba(0, 0, 0, 0.06); border: 1px solid #e2e8f0; padding: 4px;
         }
-
         #loading-progress-bar {
-            background: linear-gradient(to right, #6366f1, #9333ea); /* indigo-500 to purple-600 */
-            color: white;
-            font-size: 0.75rem; /* text-xs */
-            font-weight: bold;
-            text-align: center;
-            padding: 6px;
-            line-height: 1;
-            border-radius: 9999px;
-            box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-            transition: width 0.3s ease-out;
-            width: 0%;
+            background: linear-gradient(to right, #6366f1, #9333ea); color: white;
+            font-size: 0.75rem; font-weight: bold; text-align: center; padding: 6px;
+            line-height: 1; border-radius: 9999px; box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            transition: width 0.3s ease-out; width: 0%;
         }
-
         .animate-progress-stripes {
             background-image: linear-gradient(45deg, rgba(255, 255, 255, 0.15) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, 0.15) 50%, rgba(255, 255, 255, 0.15) 75%, transparent 75%, transparent);
-            background-size: 1rem 1rem;
-            animation: progress-stripes 1s linear infinite;
+            background-size: 1rem 1rem; animation: progress-stripes 1s linear infinite;
         }
-
-        @keyframes progress-stripes {
-            from { background-position: 1rem 0; }
-            to { background-position: 0 0; }
-        }
-
+        @keyframes progress-stripes { from { background-position: 1rem 0; } to { background-position: 0 0; } }
         .loading-text {
-            margin-top: 1rem;
-            font-size: 0.875rem; /* text-sm */
-            font-weight: bold;
-            color: #64748b; /* slate-500 */
+            margin-top: 1rem; font-size: 0.875rem; font-weight: bold; color: #64748b;
             animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
         }
-
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: .5; }
-        }
-        /* --- END: NEW LOADING OVERLAY STYLES --- */
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: .5; } }
     </style>
 </head>
 <body>
@@ -245,6 +180,7 @@
     </div>
     <p class="loading-text">กำลังประมวลผลข้อมูล...</p>
 </div>
+
 <div id="app" class="container-fluid my-2">
     <div class="card shadow-sm">
         <div class="card-body">
@@ -351,10 +287,10 @@
                                    <div v-for="student in filteredStudents" :key="student.id" class="list-group-item d-flex align-items-center p-2">
                                        <input class="form-check-input me-3" type="checkbox" v-model="student.selected" :id="'student-' + student.id" style="transform: scale(1.5);">
                                        <img :src="student.pictureUrl" class="student-avatar" alt="รูปนักเรียน" @error="imageError" @click="showStudentImage(student)">
-										<div class="ms-3 flex-grow-1" @click="student.selected = !student.selected" style="cursor: pointer;">
-											<strong>{{ student.name }}</strong><br>
-											<small class="text-muted">ห้อง {{ student.class }} เลขที่ {{ student.number }}</small>
-										</div>
+                                       <div class="ms-3 flex-grow-1" @click="student.selected = !student.selected" style="cursor: pointer;">
+                                           <strong>{{ student.name }}</strong><br>
+                                           <small class="text-muted">ห้อง {{ student.class }} เลขที่ {{ student.number }}</small>
+                                       </div>
                                    </div>
                                 </div>
                             </div>
@@ -362,13 +298,13 @@
                             <div class="row g-3 mb-4">
                                  <div class="col-md-6 position-relative" ref="activityDropdownContainer">
                                     <label for="activityName" class="form-label">ชื่อกิจกรรม</label>
-									<input type="text" class="form-control" id="activityName" 
-										   v-model="formData.activityName" 
-										   @input="isActivityDropdownVisible = true" 
-										   @focus="isActivityDropdownVisible = true; hideUnselected = true" 
-										   placeholder="เลือกหรือพิมพ์เพื่อเพิ่มกิจกรรม..." 
-										   autocomplete="off"
-										   required>
+                                    <input type="text" class="form-control" id="activityName" 
+                                           v-model="formData.activityName" 
+                                           @input="isActivityDropdownVisible = true" 
+                                           @focus="isActivityDropdownVisible = true; hideUnselected = true"
+                                           placeholder="เลือกหรือพิมพ์เพื่อเพิ่มกิจกรรม..." 
+                                           autocomplete="off"
+                                           required>
                                     <div v-if="isActivityDropdownVisible && filteredActivities.length > 0" class="autocomplete-dropdown">
                                         <a v-for="act in filteredActivities" :key="act" @click="selectActivity(act)" class="autocomplete-item">
                                             {{ act }}
@@ -520,8 +456,7 @@
                                         <th>ครูผู้รับรอง</th>
                                     </tr>
                                 </thead>
-                                <tbody>
-                                </tbody>
+                                <tbody></tbody>
                             </table>
                         </div>
                     </div>
@@ -729,7 +664,7 @@
                 classes: [],
                 activityList: [],
                 isActivityDropdownVisible: false,
-                isClassDropdownOpen: false, // For custom dropdown checkbox
+                isClassDropdownOpen: false, 
                 selectedClasses: [],
                 allFetchedStudents: [],
                 hideUnselected: false,
@@ -753,7 +688,7 @@
                 statsData: [], statsClassFilter: '', statsResultFilter: '', statsLoaded: false, dataTable: null,
                 historyData: [], historyLoaded: false, historyDataTable: null, historyClassFilter: '',
                 historyTeacherFilter: '', historyDateRange: [],
-                loadingInterval: null // For custom loader
+                loadingInterval: null 
             };
         },
         computed: {
@@ -808,7 +743,7 @@
             historyTeacherFilter() { if(this.historyDataTable) this.historyDataTable.draw(); }
         },
         methods: {
-            // --- NEW: Loading Overlay Methods ---
+            // --- Custom Loading Methods ---
             showLoading(message = 'กำลังประมวลผล...') {
                 const overlay = document.getElementById('loading-overlay');
                 const bar = document.getElementById('loading-progress-bar');
@@ -821,11 +756,9 @@
                 bar.innerText = '0%';
                 
                 if (this.loadingInterval) clearInterval(this.loadingInterval);
-                
                 this.loadingInterval = setInterval(() => {
                     if (width < 90) width += Math.random() * 5;
                     else if (width < 99) width += 0.1;
-                    
                     bar.style.width = width + '%';
                     bar.innerText = Math.round(width) + '%';
                 }, 200);
@@ -833,19 +766,12 @@
             hideLoading() {
                 const overlay = document.getElementById('loading-overlay');
                 const bar = document.getElementById('loading-progress-bar');
-                
                 if (this.loadingInterval) clearInterval(this.loadingInterval);
-                if (bar) {
-                    bar.style.width = '100%';
-                    bar.innerText = '100%';
-                }
-                
-                setTimeout(() => {
-                    if (overlay) overlay.style.display = 'none';
-                }, 500);
+                if (bar) { bar.style.width = '100%'; bar.innerText = '100%'; }
+                setTimeout(() => { if (overlay) overlay.style.display = 'none'; }, 500);
             },
-            // --- END NEW Methods ---
-
+            
+            // --- Image Compression ---
             compressImage(file, maxWidth, quality) {
                 return new Promise((resolve, reject) => {
                     const reader = new FileReader();
@@ -865,8 +791,7 @@
                             elem.height = height;
                             const ctx = elem.getContext('2d');
                             ctx.drawImage(img, 0, 0, width, height);
-                            // Corrected usage
-                            const data = elem.toDataURL('image/jpeg', quality);
+                            const data = elem.toDataURL('image/jpeg', quality); // Fix: use elem.toDataURL
                             resolve(data.split(',')[1]);
                         };
                         img.onerror = error => reject(error);
@@ -874,6 +799,7 @@
                     reader.onerror = error => reject(error);
                 });
             },
+
             updateClock() {
                 const now = new Date();
                 const days = ['วันอาทิตย์', 'วันจันทร์', 'วันอังคาร', 'วันพุธ', 'วันพฤหัสบดี', 'วันศุกร์', 'วันเสาร์'];
@@ -917,7 +843,7 @@
             },
             async fetchStudents() {
                 if (this.selectedClasses.length === 0) { this.allFetchedStudents = []; return; }
-                this.showLoading("กำลังโหลดข้อมูลนักเรียน..."); // Updated
+                this.showLoading("กำลังโหลดข้อมูลนักเรียน...");
                 try {
                     const results = await Promise.all(this.selectedClasses.map(c => fetch(`${this.webAppUrl}?action=getStudents&class=${encodeURIComponent(c)}`).then(res => res.json())));
                     let allStudents = [];
@@ -925,12 +851,12 @@
                     const uniqueStudents = Array.from(new Map(allStudents.map(item => [item['id'], item])).values());
                     this.allFetchedStudents = uniqueStudents.map(s => ({ ...s, selected: false }));
                 } catch (error) { Swal.fire('เกิดข้อผิดพลาด', 'ไม่สามารถโหลดข้อมูลนักเรียนได้', 'error'); }
-                finally { this.hideLoading(); } // Updated
+                finally { this.hideLoading(); }
             },
             resetClassSelection() {
                 this.selectedClasses = [];
                 this.allFetchedStudents = [];
-                this.isClassDropdownOpen = false; // Close dropdown on reset
+                this.isClassDropdownOpen = false;
             },
             async fetchActivities() {
                 try {
@@ -967,14 +893,7 @@
             selectAllStudents() { this.allFetchedStudents.forEach(s => s.selected = true); },
             deselectAllStudents() { this.allFetchedStudents.forEach(s => s.selected = false); },
             showStudentImage(student) { showStudentImageAlert(student.name, student.class, student.number, student.pictureUrl); },
-            fileToBase64(file) {
-                return new Promise((resolve, reject) => {
-                    const reader = new FileReader();
-                    reader.readAsDataURL(file);
-                    reader.onload = () => resolve(reader.result.split(',')[1]);
-                    reader.onerror = error => reject(error);
-                });
-            },
+            
             resetForm() {
                 const form = document.querySelector('.needs-validation');
                 if(form) form.classList.remove('was-validated');
@@ -1000,104 +919,142 @@
                 this.signatureInvalid = false;
                 if (this.signaturePad) { this.clearSignature(); }
             },
-            async submitForm(event) {
-                const form = event.target;
-                const selectedStudents = this.allFetchedStudents.filter(s => s.selected);
-                this.signatureInvalid = (this.signaturePad && this.signaturePad.isEmpty());
 
-                if (!form.checkValidity() || selectedStudents.length === 0 || !this.teacherFound || this.signatureInvalid) {
-                    form.classList.add('was-validated');
-                    Swal.fire('ข้อมูลไม่ครบถ้วน', 'กรุณากรอกข้อมูลที่จำเป็นให้ครบถ้วน, เลือกนักเรียน, และลงลายมือชื่อผู้รับรอง', 'error');
-                    return;
-                }
+            // --- Main Submit Function ---
+			async submitForm(event) {
+				const form = event.target;
+				const selectedStudents = this.allFetchedStudents.filter(s => s.selected);
+				this.signatureInvalid = (this.signaturePad && this.signaturePad.isEmpty());
 
-                const formattedDate = this.formData.activityDateFormatted; 
-                const studentListHtml = selectedStudents.map(s => `<li>${s.name}</li>`).join('');
-                const confirmationResult = await Swal.fire({
-                    title: 'ยืนยันการบันทึกข้อมูล',
-                    html: `<div class="table-responsive text-start" style="max-width: 100%; overflow-x: auto;"><table class="table table-bordered"><tbody><tr><th style="width: 30%; white-space: nowrap;">วันที่ทำกิจกรรม</th><td>${formattedDate}</td></tr><tr><th style="white-space: nowrap;">ชื่อกิจกรรม</th><td>${this.formData.activityName}</td></tr><tr><th style="white-space: nowrap;">จำนวนชั่วโมง</th><td>${this.formData.activityHours}</td></tr><tr><th style="white-space: nowrap;">นักเรียนที่เข้าร่วม (${selectedStudents.length} คน)</th><td><ul class="list-unstyled mb-0" style="max-height: 150px; overflow-y: auto;">${studentListHtml}</ul></td></tr></tbody></table></div>`,
-                    icon: 'info',
-                    width: '50rem',
-                    showCancelButton: true,
-                    confirmButtonColor: '#28a745',
-                    cancelButtonColor: '#dc3545',
-                    confirmButtonText: '<i class="fas fa-check-circle"></i> ยืนยัน',
-                    cancelButtonText: '<i class="fas fa-times-circle"></i> ยกเลิก'
-                });
+				// 1. ตรวจสอบความถูกต้อง (Validation)
+				if (!form.checkValidity() || selectedStudents.length === 0 || !this.teacherFound || this.signatureInvalid) {
+					form.classList.add('was-validated');
+					Swal.fire({
+						icon: 'warning',
+						title: 'ข้อมูลไม่ครบถ้วน',
+						text: 'กรุณากรอกข้อมูลให้ครบ, เลือกนักเรียนอย่างน้อย 1 คน และลงลายมือชื่อ',
+						confirmButtonText: 'ตกลง',
+						returnFocus: false 
+					});
+					return;
+				}
 
-                if (confirmationResult.isConfirmed) {
-                    this.isSubmitting = true;
-                    this.showLoading("กำลังบันทึกข้อมูล..."); // Updated
+				const formattedDate = this.formData.activityDateFormatted || this.formData.activityDate;
+				const studentListHtml = selectedStudents.map(s => `<li>${s.name}</li>`).join('');
 
-                    try {
-                        const photoBase64 = await this.compressImage(this.formData.activityPhoto, 1024, 0.7);
-                        const signatureBase64 = this.signaturePad.toDataURL('image/png').split(',')[1];
-                        
-                        const postData = new FormData();
-                        Object.keys(this.formData).forEach(key => {
-                            if (key !== 'teacher' && key !== 'activityPhoto') {
-                                postData.append(key, typeof this.formData[key] === 'object' ? JSON.stringify(this.formData[key]) : this.formData[key]);
-                            }
-                        });
-                        postData.append('teacher', JSON.stringify(this.formData.teacher));
-                        postData.append('students', JSON.stringify(selectedStudents));
-                        postData.append('photoBase64', photoBase64); 
-                        postData.append('photoFileName', `photo_${Date.now()}.jpg`);
-                        postData.append('signatureBase64', signatureBase64);
-                        postData.append('signatureFileName', `sig_${Date.now()}.png`);
+				// 2. แสดงหน้าต่างยืนยัน (Confirmation)
+				const confirmationResult = await Swal.fire({
+					title: 'ยืนยันการบันทึกข้อมูล',
+					html: `
+						<div class="text-start">
+							<p><strong>วันที่:</strong> ${formattedDate}</p>
+							<p><strong>กิจกรรม:</strong> ${this.formData.activityName}</p>
+							<p><strong>จำนวน:</strong> ${selectedStudents.length} คน</p>
+							<div class="border rounded p-2 mt-2 bg-light" style="max-height: 100px; overflow-y: auto;">
+								<ul class="mb-0 ps-3 small">${studentListHtml}</ul>
+							</div>
+						</div>
+					`,
+					icon: 'question',
+					showCancelButton: true,
+					confirmButtonColor: '#198754',
+					cancelButtonColor: '#dc3545',
+					confirmButtonText: '<i class="fas fa-save"></i> ยืนยัน',
+					cancelButtonText: 'ยกเลิก',
+					returnFocus: false 
+				});
 
-                        const response = await fetch(this.webAppUrl, {
-                            method: 'POST',
-                            body: postData
-                        });
-                        const result = await response.json();
+				if (confirmationResult.isConfirmed) {
+					this.isSubmitting = true;
+					this.showLoading("กำลังบันทึกข้อมูล..."); 
 
-                        if (result.success) {
-                            Swal.fire('สำเร็จ', 'บันทึกข้อมูลเรียบร้อยแล้ว', 'success');
-                            
-                            const newHistoryItem = {
-                                'วันที่ทำกิจกรรม': this.formData.activityDateFormatted || this.formData.activityDate,
-                                'ลิงก์รูปกิจกรรม': result.photoUrl || '', 
-                                'ภาคเรียน': this.formData.semester,
-                                'ปีการศึกษา': this.formData.academicYear,
-                                'ชื่อกิจกรรม': this.formData.activityName,
-                                'จำนวนชั่วโมง': this.formData.activityHours,
-                                'ชื่อ-สกุลนักเรียน': selectedStudents.map(s => s.name).join(','),
-                                'ครูผู้รับรอง': this.formData.teacher.name,
-                                'ห้อง': selectedStudents.map(s => s.class).join(',')
-                            };
-                            
-                            this.historyData.unshift(newHistoryItem);
-							// ใหม่ (ใช้การโหลดตารางใหม่จากข้อมูลในตัวแปร local แทน เพื่อให้ลำดับถูกต้องตาม Array)
-							if (this.historyDataTable) {
-								// เนื่องจากเรา unshift ข้อมูลเข้า array historyData แล้ว (ข้อมูลใหม่อยู่ index 0)
-								// การเรียก initHistoryTable จะล้างตารางเก่าและสร้างใหม่ตามลำดับใน array ทันที
-								this.initHistoryTable();
+					try {
+						// ย่อรูปภาพ
+						const photoBase64 = await this.compressImage(this.formData.activityPhoto, 1024, 0.7);
+						const signatureBase64 = this.signaturePad.toDataURL('image/png').split(',')[1];
+						
+						const postData = new FormData();
+						Object.keys(this.formData).forEach(key => {
+							if (key !== 'teacher' && key !== 'activityPhoto') {
+								postData.append(key, typeof this.formData[key] === 'object' ? JSON.stringify(this.formData[key]) : this.formData[key]);
 							}
+						});
+						postData.append('teacher', JSON.stringify(this.formData.teacher));
+						postData.append('students', JSON.stringify(selectedStudents));
+						postData.append('photoBase64', photoBase64);
+						postData.append('photoFileName', `act_${Date.now()}.jpg`);
+						postData.append('signatureBase64', signatureBase64);
+						postData.append('signatureFileName', `sig_${Date.now()}.png`);
 
-                            this.resetForm();
-							// 1. บังคับให้โหลดข้อมูลใหม่จาก Server (เพื่อให้เห็นแถวล่าสุด)
-							this.historyLoaded = false; 
+						// ส่งข้อมูล
+						const response = await fetch(this.webAppUrl, {
+							method: 'POST',
+							body: postData
+						});
+						const result = await response.json();
+
+						if (result.success) {
+							// เตรียมข้อมูลใหม่
+							const newHistoryItem = {
+								'วันที่ทำกิจกรรม': this.formData.activityDateFormatted || this.formData.activityDate,
+								'ลิงก์รูปกิจกรรม': result.photoUrl || '', 
+								'ภาคเรียน': this.formData.semester,
+								'ปีการศึกษา': this.formData.academicYear,
+								'ชื่อกิจกรรม': this.formData.activityName,
+								'จำนวนชั่วโมง': this.formData.activityHours,
+								'ชื่อ-สกุลนักเรียน': selectedStudents.map(s => s.name).join(','),
+								'ครูผู้รับรอง': this.formData.teacher.name,
+								'ห้อง': selectedStudents.map(s => s.class).join(',')
+							};
+
+							// เพิ่มข้อมูลเข้า array ทันที
+							this.historyData.unshift(newHistoryItem);
 							
-							// 2. เรียกฟังก์ชันโหลดประวัติ 
-							// (ฟังก์ชันนี้จะทำการสลับ activeTab = 'history' ให้โดยอัตโนมัติ)
-							this.loadHistory();
-                        } else {
-                            throw new Error(result.message || 'การบันทึกข้อมูลล้มเหลว');
-                        }
-                    } catch (error) {
-                        console.error('Submission Error:', error);
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'เกิดข้อผิดพลาด!',
-                            text: `ไม่สามารถบันทึกข้อมูลได้: ${error.message}`,
-                        });
-                    } finally {
-                        this.isSubmitting = false;
-                        this.hideLoading(); // Updated
-                    }
-                }
-            },
+							// รีเซ็ตฟอร์มและซ่อน loading
+							this.resetForm();
+							this.hideLoading();
+
+							// --- จุดที่แก้ไข: การอัปเดตตาราง ---
+							this.historyLoaded = true;  // บอกระบบว่ามีข้อมูลแล้ว (จะได้ไม่ต้องโหลดใหม่จาก server)
+							this.loadHistory();         // สลับไปหน้า History Tab
+							
+							// ใช้ $nextTick เพื่อรอให้ Tab แสดงผลเสร็จก่อน แล้วค่อยสั่งวาดตารางใหม่
+							this.$nextTick(() => {
+								this.initHistoryTable(); 
+							});
+							// ----------------------------------
+
+							Swal.fire({
+								icon: 'success',
+								title: 'บันทึกข้อมูลเรียบร้อยแล้ว',
+								toast: true,
+								position: 'top-end',
+								showConfirmButton: false,
+								timer: 3000,
+								timerProgressBar: true,
+								returnFocus: false 
+							});
+
+						} else {
+							throw new Error(result.message || 'Server ตอบกลับว่าไม่สำเร็จ');
+						}
+
+					} catch (error) {
+						console.error('Submission Error:', error);
+						this.hideLoading();
+						Swal.fire({
+							icon: 'error',
+							title: 'เกิดข้อผิดพลาด',
+							text: 'ไม่สามารถบันทึกข้อมูลได้: ' + error.message,
+							confirmButtonText: 'ปิด',
+							returnFocus: false 
+						});
+					} finally {
+						this.isSubmitting = false;
+					}
+				}
+			},
+
             getEvalBadgeClass(result) {
                 if (result === '✅ผ่าน') return 'bg-success';
                 if (result === '❌ไม่ผ่าน') return 'bg-danger';
@@ -1112,7 +1069,7 @@
                 this.search.dataFound = false;
                 this.search.noDataMessage = '';
                 if (this.search.historyTable) { this.search.historyTable.destroy(); $('#searchHistoryTable tbody').empty(); this.search.historyTable = null; }
-                this.showLoading("กำลังค้นหาข้อมูล..."); // Updated
+                this.showLoading("กำลังค้นหาข้อมูล...");
                 try {
                     const res = await fetch(`${this.webAppUrl}?action=getStudentHistory&studentId=${this.search.studentId}`);
                     const result = await res.json();
@@ -1125,69 +1082,57 @@
                 } catch (error) {
                     this.search.noDataMessage = 'เกิดข้อผิดพลาดในการเชื่อมต่อกับเซิร์ฟเวอร์';
                     Swal.fire('เกิดข้อผิดพลาด', 'ไม่สามารถดึงข้อมูลได้', 'error');
-                } finally { this.search.isSearching = false; this.hideLoading(); } // Updated
+                } finally { this.search.isSearching = false; this.hideLoading(); }
             },
             initSearchHistoryTable() {
                 if ($.fn.DataTable.isDataTable('#searchHistoryTable')) { $('#searchHistoryTable').DataTable().destroy(); }
                 this.search.historyTable = new DataTable('#searchHistoryTable', {
                     responsive: true, data: this.search.activities,
                     dom: "<'row'<'col-sm-12 col-md-6'l><'col-sm-12 col-md-6'f>><'row'<'col-sm-12'tr>><'row'<'col-sm-12 col-md'i><'col-sm-12 col-md-auto'p>>",
-					columns: [
-						{ 
-							data: 'วันที่ทำกิจกรรม', 
-							className: 'text-center align-middle', 
-							render: function(data, type, row) { 
-								if (type === 'display' && data) {
-									try {
-										// รับค่ามาเช่น "2568-11-30T17:00:00.000Z" (ปี พ.ศ.)
-										let isoStr = String(data);
-										
-										// 1. แปลงปี พ.ศ. ใน String ให้เป็น ค.ศ. ก่อน เพื่อให้ Date Object คำนวณ Leap Year ถูกต้อง
-										let yearBE = parseInt(isoStr.substring(0, 4)); 
-										let yearAD = yearBE - 543; 
-										let dateObj = new Date(yearAD + isoStr.substring(4));
-
-										// 2. บังคับปรับเวลาเป็น GMT+7 (ไทย) เพื่อแก้ปัญหาเวลา 17:00Z ที่เป็นของวันก่อนหน้า
-										// 17:00 UTC + 7 ชม. = 00:00 (วันถัดไปที่เป็นวันที่ถูกต้อง)
-										let bkkMillis = dateObj.getTime() + (7 * 60 * 60 * 1000);
-										let bkkDate = new Date(bkkMillis);
-
-										const thaiMonths = ["", "ม.ค.", "ก.พ.", "มี.ค.", "เม.ย.", "พ.ค.", "มิ.ย.", "ก.ค.", "ส.ค.", "ก.ย.", "ต.ค.", "พ.ย.", "ธ.ค."];
-										
-										// 3. ดึงค่าวันเดือนปี (ใช้ UTC methods เพราะเราบวกเวลาไปแล้ว)
-										let d = bkkDate.getUTCDate();
-										let m = bkkDate.getUTCMonth() + 1;
-										let yBE = bkkDate.getUTCFullYear() + 543; // แปลงกลับเป็น พ.ศ.
-										
-										// คืนค่ารูปแบบ: 1 ธ.ค. 68
-										return `${d} ${thaiMonths[m]} ${String(yBE).slice(-2)}`;
-									} catch (e) { 
-										return data; // กรณีแปลงไม่ได้ให้แสดงค่าเดิม
-									}
-								} 
-								return data; 
-							} 
-						},
-						{ data: 'ลิงก์รูปกิจกรรม', orderable: false, className: 'text-center align-middle', render: (data, type, row) => data ? `<img src="${data}" class="history-activity-image" alt="รูปกิจกรรม" onclick="showActivityImageAlert('${String(row['ชื่อกิจกรรม']).replace(/'/g, "\\'")}', '${data}')" onerror="this.onerror=null;this.src='https://placehold.co/80x80/EFEFEF/AAAAAA?text=N/A';">` : '' },
-						{ data: null, className: 'text-center align-middle', render: (data, type, row) => `${row['ภาคเรียน']}/${row['ปีการศึกษา']}` },
-						{ data: 'ชื่อกิจกรรม', className: 'align-middle' },
-						{ data: 'จำนวนชั่วโมง', className: 'text-center align-middle' },
-						{ data: 'ครูผู้รับรอง', className: 'align-middle' }
-					],
+                    columns: [
+                        // --- Custom Date Format ---
+                        { 
+                            data: 'วันที่ทำกิจกรรม', 
+                            className: 'text-center align-middle', 
+                            render: function(data, type, row) { 
+                                if (type === 'display' && data) {
+                                    try {
+                                        let isoStr = String(data);
+                                        let yearBE = parseInt(isoStr.substring(0, 4)); 
+                                        let yearAD = yearBE - 543; 
+                                        let dateObj = new Date(yearAD + isoStr.substring(4));
+                                        let bkkMillis = dateObj.getTime() + (7 * 60 * 60 * 1000);
+                                        let bkkDate = new Date(bkkMillis);
+                                        const thaiMonths = ["", "ม.ค.", "ก.พ.", "มี.ค.", "เม.ย.", "พ.ค.", "มิ.ย.", "ก.ค.", "ส.ค.", "ก.ย.", "ต.ค.", "พ.ย.", "ธ.ค."];
+                                        let d = bkkDate.getUTCDate();
+                                        let m = bkkDate.getUTCMonth() + 1;
+                                        let yBE = bkkDate.getUTCFullYear() + 543; 
+                                        return `${d} ${thaiMonths[m]} ${String(yBE).slice(-2)}`;
+                                    } catch (e) { return data; }
+                                } 
+                                return data; 
+                            } 
+                        },
+                        { data: 'ลิงก์รูปกิจกรรม', orderable: false, className: 'text-center align-middle', render: (data, type, row) => data ? `<img src="${data}" class="history-activity-image" alt="รูปกิจกรรม" onclick="showActivityImageAlert('${String(row['ชื่อกิจกรรม']).replace(/'/g, "\\'")}', '${data}')" onerror="this.onerror=null;this.src='https://placehold.co/80x80/EFEFEF/AAAAAA?text=N/A';">` : '' },
+                        { data: null, className: 'text-center align-middle', render: (data, type, row) => `${row['ภาคเรียน']}/${row['ปีการศึกษา']}` },
+                        { data: 'ชื่อกิจกรรม', className: 'align-middle' },
+                        { data: 'จำนวนชั่วโมง', className: 'text-center align-middle' },
+                        { data: 'ครูผู้รับรอง', className: 'align-middle' }
+                    ],
                     language: { url: 'https://cdn.datatables.net/plug-ins/2.0.8/i18n/th.json' }, order: [],
                 });
             },
             async loadStats() {
                 this.activeTab = 'stats';
                 if (this.statsLoaded) return;
-                this.showLoading("กำลังโหลดสถิติ..."); // Updated
+                this.showLoading("กำลังโหลดสถิติ...");
                 try {
                     const res = await fetch(`${this.webAppUrl}?action=getStudentStats`);
                     const result = await res.json();
                     if (result.success) { this.statsData = result.data; this.statsLoaded = true; this.$nextTick(() => this.initDataTable()); }
                     else { throw new Error(result.message); }
                 } catch (error) { Swal.fire('เกิดข้อผิดพลาด', `ไม่สามารถโหลดข้อมูลสถิติได้: ${error.message}`, 'error'); }
-                finally { this.hideLoading(); } // Updated
+                finally { this.hideLoading(); }
             },
             refreshStats() { this.statsLoaded = false; this.loadStats(); },
             resetStatsFilters() { this.statsClassFilter = ''; this.statsResultFilter = ''; },
@@ -1233,7 +1178,7 @@
                     });
                     return;
                 }
-                this.showLoading("กำลังโหลดประวัติ..."); // Updated
+                this.showLoading("กำลังโหลดประวัติ...");
                 try {
                     const res = await fetch(`${this.webAppUrl}?action=getHistory`);
                     const result = await res.json();
@@ -1247,7 +1192,7 @@
                     }
                     else { throw new Error(result.message || 'Unknown error'); }
                 } catch (error) { Swal.fire('เกิดข้อผิดพลาด', `ไม่สามารถโหลดข้อมูลประวัติได้: ${error.message}`, 'error'); }
-                finally { this.hideLoading(); } // Updated
+                finally { this.hideLoading(); }
             },
             initHistoryTable() {
                 if (this.historyDataTable) { this.historyDataTable.destroy(); $('#historyTable tbody').empty(); }
@@ -1283,9 +1228,7 @@
             }
         },
         async mounted() {
-            // Updated loading overlay logic to use the new method
-            this.showLoading("กำลังโหลดข้อมูลเริ่มต้น..."); 
-            
+            this.showLoading("กำลังโหลดข้อมูลเริ่มต้น...");
             this.updateClock();
             setInterval(this.updateClock, 1000);
             document.getElementById('current-year').textContent = (new Date().getFullYear() + 543);
@@ -1338,7 +1281,7 @@
             try {
                 await Promise.all([ this.fetchClasses(), this.fetchAllTeachers(), this.fetchActivities() ]);
             } catch (error) { console.error("เกิดข้อผิดพลาดระหว่างการโหลดข้อมูลเริ่มต้น:", error);
-            } finally { this.hideLoading(); } // Updated
+            } finally { this.hideLoading(); }
         },
         beforeUnmount() {
            $.fn.dataTable.ext.search.pop();
