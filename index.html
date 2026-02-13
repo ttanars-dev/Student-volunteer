@@ -4,7 +4,7 @@
    <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge, chrome=1" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PC|Student Volunteer'68 v1.5HP</title> 
+    <title>PC|Student Volunteer'68 v2.3HP</title> 
     <link rel="shortcut icon" type="image/png" href="https://img2.pic.in.th/pic/Pakchong_School-removebg-preview.png">
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -168,6 +168,60 @@
             animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
         }
         @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: .5; } }
+
+        /* --- Connection Monitor Styles --- */
+        .connection-status-card {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            z-index: 9999;
+            backdrop-filter: blur(5px);
+            background-color: rgba(255, 255, 255, 0.95);
+            border: 1px solid rgba(0,0,0,0.1);
+            border-radius: 30px;
+            padding: 5px 15px;
+            font-size: 0.85rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.15);
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .status-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+        .status-good { background-color: #198754; box-shadow: 0 0 8px #198754; } /* เขียว */
+        .status-fair { background-color: #ffc107; box-shadow: 0 0 8px #ffc107; } /* เหลือง */
+        .status-poor { background-color: #dc3545; box-shadow: 0 0 8px #dc3545; } /* แดง */
+        .status-offline { background-color: #6c757d; } /* เทา */
+
+        .offline-badge {
+            position: absolute;
+            top: -5px;
+            left: -5px;
+            background: #dc3545;
+            color: white;
+            font-size: 0.7rem;
+            padding: 2px 6px;
+            border-radius: 10px;
+            animation: bounce 1s infinite;
+            font-weight: bold;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+        @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-3px); } }
+
+        /* Make offline items clickable */
+        .offline-badge, .offline-status-text {
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        .offline-badge:hover, .offline-status-text:hover {
+            transform: scale(1.1);
+            text-decoration: underline;
+        }
     </style>
 </head>
 <body>
@@ -183,6 +237,25 @@
 </div>
 
 <div id="app" class="container-fluid my-2">
+    <div class="connection-status-card" v-if="connection.initialized">
+        <div v-if="offlineQueue.length > 0" class="offline-badge" @click="showOfflineQueueDetails" title="คลิกเพื่อดูรายละเอียด">
+            {{ offlineQueue.length }} รอ Sync
+        </div>
+        
+        <div class="d-flex flex-column align-items-end" style="line-height: 1.1;">
+            <span class="fw-bold" :class="connection.textClass">
+                {{ connection.isOnline ? connection.qualityText : 'คุณกำลัง Offline อยู่' }}
+            </span>
+            <span v-if="connection.isOnline" style="font-size: 0.7em; color: #666;">
+                Ping: {{ connection.ping }}ms | {{ connection.speedMbps }} Mbps
+            </span>
+            <span v-else style="font-size: 0.7em; color: #dc3545;" class="offline-status-text" @click="showOfflineQueueDetails" title="คลิกเพื่อดูรายละเอียด">
+                บันทึกในเครื่อง: {{ offlineQueue.length }} รายการ (คลิกดู)
+            </span>
+        </div>
+        <div class="status-indicator" :class="connection.statusClass"></div>
+    </div>
+
     <div class="card shadow-sm">
         <div class="card-body">
             <div class="text-center">
@@ -692,7 +765,21 @@
                 statsData: [], statsClassFilter: '', statsResultFilter: '', statsLoaded: false, dataTable: null,
                 historyData: [], historyLoaded: false, historyDataTable: null, historyClassFilter: '',
                 historyTeacherFilter: '', historyDateRange: [],
-                loadingInterval: null 
+                loadingInterval: null,
+                
+                // --- New Features: Connection & Offline ---
+                connection: {
+                    initialized: false,
+                    isOnline: navigator.onLine,
+                    ping: 0,
+                    speedMbps: 0,
+                    qualityText: 'Checking...', 
+                    statusClass: 'status-offline', 
+                    textClass: 'text-muted'
+                },
+                offlineQueue: JSON.parse(localStorage.getItem('stv_offline_queue') || '[]'),
+                networkInterval: null,
+                isSyncing: false
             };
         },
         computed: {
@@ -839,6 +926,208 @@
                 } catch (error) { console.error('Error fetching activities:', error); }
             },
 
+            // --- Network & Offline Logic ---
+            async checkNetworkStatus() {
+                // ถ้า Navigator บอก Offline ก็เชื่อเลย
+                if (!navigator.onLine) {
+                    this.setConnectionStatus(false, 0, 0);
+                    return;
+                }
+
+                // ถ้า Navigator บอก Online ลอง Ping เพื่อความชัวร์
+                const startTime = Date.now();
+                const imgUrl = "https://www.google.com/images/branding/googlelogo/1x/googlelogo_light_color_272x92dp.png?t=" + startTime;
+                const downloadSize = 3000; // ~3KB
+
+                try {
+                    await fetch(imgUrl, { mode: 'no-cors' }); 
+                    const endTime = Date.now();
+                    const duration = endTime - startTime; // Ping (ms)
+                    
+                    const speedBps = (downloadSize * 8) / (duration / 1000);
+                    const speedMbps = (speedBps / 1024 / 1024).toFixed(2);
+                    
+                    this.setConnectionStatus(true, duration, speedMbps);
+                    
+                    // Auto Sync: ถ้ามีเน็ตและมีของค้าง ให้ Sync ทันที!
+                    if (this.offlineQueue.length > 0 && !this.isSyncing) {
+                        this.syncOfflineQueue();
+                    }
+
+                } catch (error) {
+                    // Ping ไม่ผ่านแสดงว่าเน็ตมีปัญหาจริง
+                    this.setConnectionStatus(false, 0, 0);
+                }
+            },
+
+            setConnectionStatus(isOnline, ping, speed) {
+                this.connection.isOnline = isOnline;
+                this.connection.ping = ping;
+                this.connection.speedMbps = speed;
+                this.connection.initialized = true;
+
+                if (!isOnline) {
+                    this.connection.qualityText = 'No Internet';
+                    this.connection.statusClass = 'status-offline';
+                    this.connection.textClass = 'text-danger';
+                } else {
+                    if (ping < 100) {
+                        this.connection.qualityText = 'ดีมาก (Excellent)';
+                        this.connection.statusClass = 'status-good';
+                        this.connection.textClass = 'text-success';
+                    } else if (ping < 300) {
+                        this.connection.qualityText = 'พอใช้ (Fair)';
+                        this.connection.statusClass = 'status-fair';
+                        this.connection.textClass = 'text-warning';
+                    } else {
+                        this.connection.qualityText = 'แย่ (Poor)';
+                        this.connection.statusClass = 'status-poor';
+                        this.connection.textClass = 'text-danger';
+                    }
+                }
+            },
+
+            showOfflineQueueDetails() {
+                if (this.offlineQueue.length === 0) return;
+
+                let htmlContent = '<div class="text-start" style="max-height: 400px; overflow-y: auto; font-size: 0.9rem;">';
+
+                this.offlineQueue.forEach((item, index) => {
+                    const d = item.data.formData;
+                    const students = item.data.selectedStudents;
+                    const dateShow = d.activityDateFormatted || d.activityDate;
+
+                    htmlContent += `
+                        <div class="card mb-3 border-secondary shadow-sm">
+                            <div class="card-header bg-light py-2">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <strong>#${index + 1} วันที่: ${dateShow}</strong>
+                                    <span class="badge bg-warning text-dark">รอส่ง</span>
+                                </div>
+                                <div class="text-primary fw-bold mt-1">${d.activityName} (${d.activityHours} ชม.)</div>
+                            </div>
+                            <div class="card-body p-2 bg-white">
+                                <div class="fw-bold mb-1 border-bottom pb-1"><i class="fas fa-users"></i> รายชื่อนักเรียน (${students.length} คน)</div>
+                                <ul class="mb-0 ps-3 text-muted small" style="list-style-type: circle;">
+                    `;
+
+                    students.forEach(s => {
+                        htmlContent += `<li><strong>${s.name}</strong> (ม.${s.class} เลขที่ ${s.number})</li>`;
+                    });
+
+                    htmlContent += `
+                                </ul>
+                            </div>
+                        </div>`;
+                });
+
+                htmlContent += '</div>';
+
+                Swal.fire({
+                    title: `<i class="fas fa-cloud-upload-alt text-danger"></i> รายการรอ Sync (${this.offlineQueue.length})`,
+                    html: htmlContent,
+                    width: '600px',
+                    showCloseButton: true,
+                    showConfirmButton: false,
+                    footer: '<small class="text-muted">ข้อมูลจะถูกส่งอัตโนมัติเมื่อเชื่อมต่อเน็ตได้</small>'
+                });
+            },
+
+            addToOfflineQueue(formData, selectedStudents, photoBase64, signatureBase64) {
+                try {
+                    const queueItem = {
+                        id: Date.now(),
+                        timestamp: new Date().toISOString(),
+                        data: {
+                            formData: JSON.parse(JSON.stringify(formData)),
+                            selectedStudents: selectedStudents,
+                            photoBase64: photoBase64,
+                            signatureBase64: signatureBase64
+                        }
+                    };
+                    
+                    this.offlineQueue.push(queueItem);
+                    localStorage.setItem('stv_offline_queue', JSON.stringify(this.offlineQueue));
+                    
+                    Swal.fire({
+                        icon: 'info',
+                        title: 'บันทึกแบบออฟไลน์',
+                        text: 'อินเทอร์เน็ตมีปัญหา ระบบบันทึกข้อมูลลงเครื่องแล้ว และจะส่งอัตโนมัติเมื่อเน็ตมา',
+                        confirmButtonText: 'รับทราบ'
+                    });
+                    
+                    this.resetForm();
+                    
+                } catch (e) {
+                    Swal.fire('Memory Full', 'พื้นที่จัดเก็บในเครื่องเต็ม ไม่สามารถบันทึกออฟไลน์ได้', 'error');
+                }
+            },
+
+            async syncOfflineQueue() {
+                if (this.offlineQueue.length === 0 || this.isSyncing) return;
+
+                this.isSyncing = true;
+                const total = this.offlineQueue.length;
+                
+                const Toast = Swal.mixin({
+                    toast: true, position: 'bottom-end', showConfirmButton: false, timer: 3000
+                });
+                Toast.fire({ icon: 'info', title: `กำลัง Sync ข้อมูล ${total} รายการ...` });
+
+                const queueCopy = [...this.offlineQueue];
+                let successCount = 0;
+
+                for (const item of queueCopy) {
+                    try {
+                        const postData = new FormData();
+                        const d = item.data;
+                        
+                        Object.keys(d.formData).forEach(key => {
+                            if (key !== 'teacher' && key !== 'activityPhoto') {
+                                 postData.append(key, typeof d.formData[key] === 'object' ? JSON.stringify(d.formData[key]) : d.formData[key]);
+                            }
+                        });
+                        postData.append('teacher', JSON.stringify(d.formData.teacher));
+                        postData.append('students', JSON.stringify(d.selectedStudents));
+                        postData.append('photoBase64', d.photoBase64);
+                        postData.append('photoFileName', `act_${item.id}.jpg`);
+                        postData.append('signatureBase64', d.signatureBase64);
+                        postData.append('signatureFileName', `sig_${item.id}.png`);
+
+                        const response = await fetch(this.webAppUrl, { method: 'POST', body: postData });
+                        const result = await response.json();
+
+                        if (result.success) {
+                            this.offlineQueue = this.offlineQueue.filter(q => q.id !== item.id);
+                            localStorage.setItem('stv_offline_queue', JSON.stringify(this.offlineQueue));
+                            successCount++;
+                            
+                             const newHistoryItem = {
+                                'วันที่ทำกิจกรรม': d.formData.activityDateFormatted || d.formData.activityDate,
+                                'ลิงก์รูปกิจกรรม': result.photoUrl || '', 
+                                'ภาคเรียน': d.formData.semester,
+                                'ปีการศึกษา': d.formData.academicYear,
+                                'ชื่อกิจกรรม': d.formData.activityName,
+                                'จำนวนชั่วโมง': d.formData.activityHours,
+                                'ชื่อ-สกุลนักเรียน': d.selectedStudents.map(s => s.name).join(','),
+                                'ครูผู้รับรอง': d.formData.teacher.name,
+                                'ห้อง': d.selectedStudents.map(s => s.class).join(',')
+                            };
+                            this.historyData.unshift(newHistoryItem);
+                        }
+                    } catch (err) {
+                        console.error("Sync Failed for item", item.id, err);
+                    }
+                }
+                
+                this.isSyncing = false;
+                if (successCount > 0) {
+                    Toast.fire({ icon: 'success', title: `Sync สำเร็จ ${successCount} รายการ` });
+                    this.historyLoaded = true;
+                    this.loadHistory();
+                }
+            },
+
             // --- Local Logic ---
             findTeacherLocally() {
                 this.teacherFound = false;
@@ -919,7 +1208,7 @@
                 if (this.signaturePad) { this.clearSignature(); }
             },
 
-            // --- MAIN SUBMIT FUNCTION ---
+            // --- UPDATED MAIN SUBMIT FUNCTION ---
 			async submitForm(event) {
 				const form = event.target;
 				const selectedStudents = this.allFetchedStudents.filter(s => s.selected);
@@ -943,9 +1232,10 @@
 					title: 'ยืนยันการบันทึกข้อมูล',
 					html: `
 						<div class="text-start">
-							<p><strong>วันที่:</strong> ${formattedDate}</p>
-							<p><strong>กิจกรรม:</strong> ${this.formData.activityName}</p>
-							<p><strong>จำนวน:</strong> ${selectedStudents.length} คน</p>
+							<p class="mb-1"><strong>วันที่:</strong> ${formattedDate}</p>
+							<p class="mb-1"><strong>กิจกรรม:</strong> ${this.formData.activityName}</p>
+                            <p class="mb-1 text-primary"><strong>จำนวนชั่วโมง:</strong> ${this.formData.activityHours} ชั่วโมง</p>
+							<p class="mb-1"><strong>จำนวนนักเรียน:</strong> ${selectedStudents.length} คน</p>
 							<div class="border rounded p-2 mt-2 bg-light" style="max-height: 100px; overflow-y: auto;">
 								<ul class="mb-0 ps-3 small">${studentListHtml}</ul>
 							</div>
@@ -961,13 +1251,21 @@
 
 				if (confirmationResult.isConfirmed) {
 					this.isSubmitting = true;
-					this.showLoading("กำลังบันทึกข้อมูล..."); 
+					this.showLoading("กำลังประมวลผล..."); 
 
 					try {
 						// Image Compression
 						const photoBase64 = await this.compressImage(this.formData.activityPhoto, 1024, 0.7);
 						const signatureBase64 = this.signaturePad.toDataURL('image/png').split(',')[1];
 						
+                        // *** Offline Check ***
+                        if (!this.connection.isOnline) {
+                            this.hideLoading();
+                            this.addToOfflineQueue(this.formData, selectedStudents, photoBase64, signatureBase64);
+                            this.isSubmitting = false;
+                            return;
+                        }
+
 						const postData = new FormData();
 						Object.keys(this.formData).forEach(key => {
 							if (key !== 'teacher' && key !== 'activityPhoto') {
@@ -1002,7 +1300,6 @@
 							this.resetForm();
 							this.hideLoading();
 
-							// Force refresh history table
 							this.historyLoaded = true; 
 							this.loadHistory(); 
 							this.$nextTick(() => { this.initHistoryTable(); });
@@ -1011,7 +1308,7 @@
 								icon: 'success',
 								title: 'บันทึกข้อมูลเรียบร้อยแล้ว',
 								toast: true,
-								position: 'top-end',
+								position: 'bottom-end',
 								showConfirmButton: false,
 								timer: 3000,
 								timerProgressBar: true
@@ -1024,7 +1321,13 @@
 					} catch (error) {
 						console.error('Submission Error:', error);
 						this.hideLoading();
-						Swal.fire('เกิดข้อผิดพลาด', 'ไม่สามารถบันทึกข้อมูลได้ กรุณาตรวจสอบอินเทอร์เน็ต', 'error');
+                        
+                        // Failover to Offline Mode
+                        if (!navigator.onLine) {
+                             this.addToOfflineQueue(this.formData, selectedStudents, photoBase64, signatureBase64);
+                        } else {
+						     Swal.fire('เกิดข้อผิดพลาด', 'ไม่สามารถบันทึกข้อมูลได้ กรุณาตรวจสอบอินเทอร์เน็ต', 'error');
+                        }
 					} finally {
 						this.isSubmitting = false;
 					}
@@ -1246,8 +1549,40 @@
                 }
             });
 
+            // --- Network Monitor & Event Listeners ---
+            this.checkNetworkStatus(); // Check on Load
+            this.networkInterval = setInterval(() => { this.checkNetworkStatus(); }, 3000); // Check every 3s
+
+            window.addEventListener('online', () => {
+                this.checkNetworkStatus();
+                Swal.fire({ 
+                    icon: 'success', 
+                    title: 'ออนไลน์', 
+                    text: 'เชื่อมต่ออินเทอร์เน็ตแล้ว ระบบกำลังซิงค์ข้อมูล...', 
+                    toast: true, 
+                    position: 'bottom-end', // Update Position
+                    timer: 3000, 
+                    showConfirmButton: false 
+                });
+            });
+            window.addEventListener('offline', () => {
+                this.checkNetworkStatus();
+                Swal.fire({ 
+                    icon: 'warning', 
+                    title: 'ออฟไลน์', 
+                    text: 'อินเทอร์เน็ตหลุด! ระบบจะเข้าสู่โหมดบันทึกในเครื่อง', 
+                    toast: true, 
+                    position: 'bottom-end', // Update Position
+                    timer: 3000, 
+                    showConfirmButton: false 
+                });
+            });
+            
+            if (this.offlineQueue.length > 0) {
+                setTimeout(() => this.syncOfflineQueue(), 2000);
+            }
+
             try {
-                // Call initial APIs (now using caching on server)
                 await Promise.all([ this.fetchClasses(), this.fetchAllTeachers(), this.fetchActivities() ]);
             } catch (error) { 
                 console.error("Init Error:", error);
@@ -1258,6 +1593,7 @@
         beforeUnmount() {
            $.fn.dataTable.ext.search.pop();
            $.fn.dataTable.ext.search.pop();
+           if(this.networkInterval) clearInterval(this.networkInterval);
         },
     });
 
